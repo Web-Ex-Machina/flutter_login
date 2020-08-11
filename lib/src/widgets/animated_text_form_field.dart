@@ -197,6 +197,10 @@ class _AnimatedTextFormFieldState extends State<AnimatedTextFormField> {
               child: widget.suffixIcon,
             )
           : widget.suffixIcon),
+      floatingLabelBehavior: FloatingLabelBehavior.never,
+      labelStyle: TextStyle(
+        fontSize: widget.focusNode.hasFocus ? 0 : 16
+      )
     );
   }
 
