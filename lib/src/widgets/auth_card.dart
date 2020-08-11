@@ -31,6 +31,7 @@ class AuthCard extends StatefulWidget {
     this.onPressedSignUp,
     this.hideButtonForgotPassword,
     this.hideButtonSignUp,
+    this.defaultUsername,
   }) : super(key: key);
 
   final EdgeInsets padding;
@@ -42,6 +43,7 @@ class AuthCard extends StatefulWidget {
   final Function onPressedSignUp;
   final bool hideButtonForgotPassword;
   final bool hideButtonSignUp;
+  final String defaultUsername;
 
   @override
   AuthCardState createState() => AuthCardState();
@@ -303,6 +305,7 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
                     onPressedSignUp: widget.onPressedSignUp,
                     hideButtonForgotPassword: widget.hideButtonForgotPassword,
                     hideButtonSignUp: widget.hideButtonSignUp,
+                    defaultUsername: widget.defaultUsername,
                   ),
                 )
               : _RecoverCard(
@@ -346,6 +349,7 @@ class _LoginCard extends StatefulWidget {
     this.onPressedSignUp,
     this.hideButtonForgotPassword,
     this.hideButtonSignUp,
+    this.defaultUsername,
   }) : super(key: key);
 
   final AnimationController loadingController;
@@ -357,6 +361,7 @@ class _LoginCard extends StatefulWidget {
   final Function onPressedSignUp;
   final bool hideButtonForgotPassword;
   final bool hideButtonSignUp;
+  final String defaultUsername;
 
   @override
   _LoginCardState createState() => _LoginCardState();
@@ -365,6 +370,7 @@ class _LoginCard extends StatefulWidget {
 class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
   final GlobalKey<FormState> _formKey = GlobalKey();
 
+  final _nameFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
   final _confirmPasswordFocusNode = FocusNode();
 
@@ -394,7 +400,7 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
     super.initState();
 
     final auth = Provider.of<Auth>(context, listen: false);
-    _nameController = TextEditingController(text: auth.email);
+    _nameController = TextEditingController(text: widget.defaultUsername);
     _passController = TextEditingController(text: auth.password);
     _confirmPassController = TextEditingController(text: auth.confirmPassword);
 
@@ -445,6 +451,7 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
     super.dispose();
 
     _loadingController?.removeStatusListener(handleLoadingAnimationStatus);
+    _nameFocusNode.dispose();
     _passwordFocusNode.dispose();
     _confirmPasswordFocusNode.dispose();
 
@@ -532,10 +539,12 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
       onFieldSubmitted: (value) {
+        _nameFocusNode.unfocus();
         FocusScope.of(context).requestFocus(_passwordFocusNode);
       },
       validator: widget.emailValidator,
       onSaved: (value) => auth.email = value,
+      focusNode: _nameFocusNode,
     );
   }
 
@@ -550,6 +559,7 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
           auth.isLogin ? TextInputAction.done : TextInputAction.next,
       focusNode: _passwordFocusNode,
       onFieldSubmitted: (value) {
+        _passwordFocusNode.unfocus();
         if (auth.isLogin) {
           _submit();
         } else {
@@ -597,8 +607,8 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
       child: FlatButton(
         child: Text(
           messages.forgotPasswordButton,
-          style: theme.textTheme.body1,
-          textAlign: TextAlign.left,
+          style: TextStyle(color: Color.fromRGBO(126, 102, 64, 1)),
+          textAlign: TextAlign.center,
         ),
         onPressed: buttonEnabled ? () {
           // save state to populate email field on recovery card
@@ -612,11 +622,22 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
   Widget _buildSubmitButton(ThemeData theme, LoginMessages messages, Auth auth) {
     return ScaleTransition(
       scale: _buttonScaleAnimation,
-      child: AnimatedButton(
-        controller: _submitController,
-        text: auth.isLogin ? messages.loginButton : messages.signupButton,
-        onPressed: _submit,
-      ),
+      child: Container(
+        width: 200,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+              colors: [Color.fromRGBO(78, 202, 241, 1), Color.fromRGBO(169, 219, 235, 1)],
+          ),
+          borderRadius: BorderRadius.circular(25.0),
+        ),
+        child: AnimatedButton(
+          color: Colors.transparent,
+          loadingColor: Colors.transparent,
+          controller: _submitController,
+          text: auth.isLogin ? messages.loginButton : messages.signupButton,
+          onPressed: _submit,
+        ),
+      )
     );
   }
 
@@ -650,7 +671,7 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
     final messages = Provider.of<LoginMessages>(context, listen: false);
     final theme = Theme.of(context);
     final deviceSize = MediaQuery.of(context).size;
-    final cardWidth = min(deviceSize.width * 0.75, 360.0);
+    final cardWidth = deviceSize.width;
     const cardPadding = 16.0;
     final textFieldWidth = cardWidth - cardPadding * 2;
     final authForm = Form(
@@ -705,11 +726,26 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
       ),
     );
 
-    return FittedBox(
-      child: Card(
-        elevation: _showShadow ? theme.cardTheme.elevation : 0,
-        child: authForm,
-      ),
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: <Widget>[
+        SizedBox(
+          height: deviceSize.height / 2,
+          child: Container(
+            constraints: BoxConstraints(
+                minWidth: deviceSize.width
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.cardTheme.color,
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(25.0), topRight: Radius.circular(25.0))
+              ),
+              child: authForm,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -733,6 +769,7 @@ class _RecoverCardState extends State<_RecoverCard>
   final GlobalKey<FormState> _formRecoverKey = GlobalKey();
 
   TextEditingController _nameController;
+  final _nameFocusNode = FocusNode();
 
   var _isSubmitting = false;
 
@@ -793,14 +830,26 @@ class _RecoverCardState extends State<_RecoverCard>
       onFieldSubmitted: (value) => _submit(),
       validator: widget.emailValidator,
       onSaved: (value) => auth.email = value,
+      focusNode: _nameFocusNode
     );
   }
 
   Widget _buildRecoverButton(ThemeData theme, LoginMessages messages) {
-    return AnimatedButton(
-      controller: _submitController,
-      text: messages.recoverPasswordButton,
-      onPressed: !_isSubmitting ? _submit : null,
+    return Container(
+      width: 200,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color.fromRGBO(78, 202, 241, 1), Color.fromRGBO(169, 219, 235, 1)],
+        ),
+        borderRadius: BorderRadius.circular(25.0),
+      ),
+      child: AnimatedButton(
+        color: Colors.transparent,
+        loadingColor: Colors.transparent,
+        controller: _submitController,
+        text: messages.recoverPasswordButton,
+        onPressed: !_isSubmitting ? _submit : null,
+      ),
     );
   }
 
@@ -813,7 +862,7 @@ class _RecoverCardState extends State<_RecoverCard>
       } : null,
       padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 4),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      textColor: theme.primaryColor,
+      textColor: Color.fromRGBO(126, 102, 64, 1),
     );
   }
 
@@ -827,7 +876,62 @@ class _RecoverCardState extends State<_RecoverCard>
     const cardPadding = 16.0;
     final textFieldWidth = cardWidth - cardPadding * 2;
 
-    return FittedBox(
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: <Widget>[
+        SizedBox(
+          height: deviceSize.height / 2,
+          child: Container(
+            constraints: BoxConstraints(
+                minWidth: deviceSize.width
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                  color: theme.cardTheme.color,
+                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(25.0), topRight: Radius.circular(25.0))
+              ),
+              child: Container(
+                padding: const EdgeInsets.only(
+                  left: cardPadding,
+                  top: cardPadding + 10.0,
+                  right: cardPadding,
+                  bottom: cardPadding,
+                ),
+                width: cardWidth,
+                alignment: Alignment.center,
+                child: Form(
+                  key: _formRecoverKey,
+                  child: Column(
+                    children: [
+                      Text(
+                        messages.recoverPasswordIntro,
+                        key: kRecoverPasswordIntroKey,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.body1,
+                      ),
+                      SizedBox(height: 20),
+                      _buildRecoverNameField(textFieldWidth, messages, auth),
+                      SizedBox(height: 20),
+                      Text(
+                        messages.recoverPasswordDescription,
+                        key: kRecoverPasswordDescriptionKey,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      SizedBox(height: 26),
+                      _buildRecoverButton(theme, messages),
+                      _buildBackButton(theme, messages),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+
+    /*return FittedBox(
       // width: cardWidth,
       child: Card(
         child: Container(
@@ -866,6 +970,6 @@ class _RecoverCardState extends State<_RecoverCard>
           ),
         ),
       ),
-    );
+    );*/
   }
 }

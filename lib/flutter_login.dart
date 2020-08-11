@@ -1,5 +1,6 @@
 library flutter_login;
 
+import "dart:ui";
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
@@ -181,9 +182,11 @@ class __HeaderState extends State<_Header> {
     }
 
     return SizedBox(
+      width: MediaQuery.of(context).size.width,
       height: widget.height,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           if (displayLogo)
             FadeIn(
@@ -221,11 +224,13 @@ class FlutterLogin extends StatefulWidget {
     this.onSubmitAnimationCompleted,
     this.logoTag,
     this.titleTag,
+    this.backgroundImage,
     this.showDebugButtons = false,
     this.headerMarginBottom = 15,
     this.headerMarginTop = 0,
     this.hideButtonForgotPassword = false,
     this.hideButtonSignUp = false,
+    this.defaultUsername = "",
   }) : super(key: key);
 
   /// Called when the user hit the submit button when in sign up mode
@@ -292,16 +297,22 @@ class FlutterLogin extends StatefulWidget {
   /// Hide the Button SignUp
   final bool hideButtonSignUp;
 
+  /// Default username
+  final String defaultUsername;
+
+  /// Image background
+  final AssetImage backgroundImage;
+
   static final FormFieldValidator<String> defaultEmailValidator = (value) {
     if (value.isEmpty || !Regex.email.hasMatch(value)) {
-      return 'Invalid email!';
+      return 'Email invalide !';
     }
     return null;
   };
 
   static final FormFieldValidator<String> defaultPasswordValidator = (value) {
     if (value.isEmpty || value.length <= 2) {
-      return 'Password is too short!';
+      return 'Le mot de passe est trop court !';
     }
     return null;
   };
@@ -566,7 +577,7 @@ class _FlutterLoginState extends State<FlutterLogin>
         widget.emailValidator ?? FlutterLogin.defaultEmailValidator;
     final passwordValidator =
         widget.passwordValidator ?? FlutterLogin.defaultPasswordValidator;
-    
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(
@@ -599,6 +610,31 @@ class _FlutterLoginState extends State<FlutterLogin>
                   alignment: Alignment.center,
                   children: <Widget>[
                     Positioned(
+                      // top: cardTopPosition - headerHeight - logoMarginBottom + logoMarginTop,
+                      top: 24, // Android Native top bar height
+                      child: Container(
+                          width: deviceSize.width,
+                          height: deviceSize.height / 2,
+                          decoration: const BoxDecoration(
+                            image:  DecorationImage(
+                              image: AssetImage("assets/media/splashscreen.jpg"),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          child: Stack(
+                            children: <Widget>[
+                              BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                                child: Container(
+                                  color: Colors.black.withOpacity(.1),
+                                ),
+                              ),
+                              _buildHeader(deviceSize.height / 2, loginTheme)
+                            ],
+                          )
+                      ),
+                    ),
+                    Positioned(
                       child: AuthCard(
                         key: authCardKey,
                         padding: EdgeInsets.only(top: cardTopPosition + logoMarginTop),
@@ -610,11 +646,8 @@ class _FlutterLoginState extends State<FlutterLogin>
                         onPressedSignUp: widget.onPressedSignUp,
                         hideButtonForgotPassword: widget.hideButtonForgotPassword,
                         hideButtonSignUp: widget.hideButtonSignUp,
+                        defaultUsername: widget.defaultUsername,
                       ),
-                    ),
-                    Positioned(
-                      top: cardTopPosition - headerHeight - logoMarginBottom + logoMarginTop,
-                      child: _buildHeader(headerHeight, loginTheme),
                     ),
                   ],
                 ),
