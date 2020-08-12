@@ -611,10 +611,10 @@ class _FlutterLoginState extends State<FlutterLogin>
                   children: <Widget>[
                     Positioned(
                       // top: cardTopPosition - headerHeight - logoMarginBottom + logoMarginTop,
-                      top: 24, // Android Native top bar height
+                      top: 0, // Android Native top bar height
                       child: Container(
                           width: deviceSize.width,
-                          height: deviceSize.height / 2,
+                          height: deviceSize.height,
                           decoration: const BoxDecoration(
                             image:  DecorationImage(
                               image: AssetImage("assets/media/splashscreen.jpg"),
