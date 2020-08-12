@@ -930,46 +930,5 @@ class _RecoverCardState extends State<_RecoverCard>
         ),
       ],
     );
-
-    /*return FittedBox(
-      // width: cardWidth,
-      child: Card(
-        child: Container(
-          padding: const EdgeInsets.only(
-            left: cardPadding,
-            top: cardPadding + 10.0,
-            right: cardPadding,
-            bottom: cardPadding,
-          ),
-          width: cardWidth,
-          alignment: Alignment.center,
-          child: Form(
-            key: _formRecoverKey,
-            child: Column(
-              children: [
-                Text(
-                  messages.recoverPasswordIntro,
-                  key: kRecoverPasswordIntroKey,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.body1,
-                ),
-                SizedBox(height: 20),
-                _buildRecoverNameField(textFieldWidth, messages, auth),
-                SizedBox(height: 20),
-                Text(
-                  messages.recoverPasswordDescription,
-                  key: kRecoverPasswordDescriptionKey,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.body1,
-                ),
-                SizedBox(height: 26),
-                _buildRecoverButton(theme, messages),
-                _buildBackButton(theme, messages),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );*/
   }
 }
