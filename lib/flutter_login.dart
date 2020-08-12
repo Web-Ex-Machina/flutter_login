@@ -146,10 +146,10 @@ class __HeaderState extends State<_Header> {
         ? Image.asset(
             widget.logoPath,
             filterQuality: FilterQuality.high,
-            height: logoHeight,
+            // height: logoHeight,
             fit: BoxFit.contain,
             alignment: Alignment.center,
-            width: (MediaQuery.of(context).size.width)*0.7,
+            width: (MediaQuery.of(context).size.width) * 0.7,
           )
         : NullWidget();
 
@@ -181,7 +181,7 @@ class __HeaderState extends State<_Header> {
       title = null;
     }
 
-    return SizedBox(
+    return Container(
       width: MediaQuery.of(context).size.width,
       height: widget.height,
       child: Column(
@@ -607,48 +607,51 @@ class _FlutterLoginState extends State<FlutterLogin>
               child: Theme(
                 data: theme,
                 child: Stack(
-                  alignment: Alignment.center,
                   children: <Widget>[
-                    Positioned(
-                      // top: cardTopPosition - headerHeight - logoMarginBottom + logoMarginTop,
-                      top: 0, // Android Native top bar height
-                      child: Container(
-                          width: deviceSize.width,
-                          height: deviceSize.height,
-                          decoration: const BoxDecoration(
-                            image:  DecorationImage(
-                              image: AssetImage("assets/media/splashscreen.jpg"),
-                              fit: BoxFit.cover,
-                            ),
+                    Container(
+                        width: deviceSize.width,
+                        height: deviceSize.height,
+                        decoration: const BoxDecoration(
+                          image:  DecorationImage(
+                            image: AssetImage("assets/media/splashscreen.jpg"),
+                            fit: BoxFit.cover,
                           ),
-                          child: Stack(
-                            children: <Widget>[
-                              BackdropFilter(
-                                filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-                                child: Container(
-                                  color: Colors.black.withOpacity(.1),
-                                ),
+                        ),
+                        child: Stack(
+                          children: <Widget>[
+                            BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                              child: Container(
+                                color: Colors.black.withOpacity(.5),
                               ),
-                              _buildHeader(deviceSize.height / 2, loginTheme)
-                            ],
-                          )
-                      ),
+                            ),
+                            _buildHeader(deviceSize.height / 2 + 24, loginTheme),
+                          ],
+                        )
                     ),
-                    Positioned(
-                      child: AuthCard(
-                        key: authCardKey,
-                        padding: EdgeInsets.only(top: cardTopPosition + logoMarginTop),
-                        loadingController: _loadingController,
-                        emailValidator: emailValidator,
-                        passwordValidator: passwordValidator,
-                        onSubmit: _reverseHeaderAnimation,
-                        onSubmitCompleted: widget.onSubmitAnimationCompleted,
-                        onPressedSignUp: widget.onPressedSignUp,
-                        hideButtonForgotPassword: widget.hideButtonForgotPassword,
-                        hideButtonSignUp: widget.hideButtonSignUp,
-                        defaultUsername: widget.defaultUsername,
+                    Container(
+                      //width: deviceSize.width,
+                      //height: deviceSize.height,
+                      child: Column(
+                        //mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          AuthCard(
+                            key: authCardKey,
+                            padding: EdgeInsets.zero,
+                            loadingController: _loadingController,
+                            emailValidator: emailValidator,
+                            passwordValidator: passwordValidator,
+                            onSubmit: _reverseHeaderAnimation,
+                            onSubmitCompleted: widget.onSubmitAnimationCompleted,
+                            onPressedSignUp: widget.onPressedSignUp,
+                            hideButtonForgotPassword: widget.hideButtonForgotPassword,
+                            hideButtonSignUp: widget.hideButtonSignUp,
+                            defaultUsername: widget.defaultUsername,
+                          ),
+                        ],
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),

@@ -604,18 +604,21 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
       fadeDirection: FadeDirection.bottomToTop,
       offset: .5,
       curve: _textButtonLoadingAnimationInterval,
-      child: FlatButton(
-        child: Text(
-          messages.forgotPasswordButton,
-          style: TextStyle(color: Color.fromRGBO(126, 102, 64, 1)),
-          textAlign: TextAlign.center,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 4),
+        child: FlatButton(
+          child: Text(
+            messages.forgotPasswordButton,
+            style: TextStyle(color: Color.fromRGBO(126, 102, 64, 1)),
+            textAlign: TextAlign.center,
+          ),
+          onPressed: buttonEnabled ? () {
+            // save state to populate email field on recovery card
+            _formKey.currentState.save();
+            widget.onSwitchRecoveryPassword();
+          } : null,
         ),
-        onPressed: buttonEnabled ? () {
-          // save state to populate email field on recovery card
-          _formKey.currentState.save();
-          widget.onSwitchRecoveryPassword();
-        } : null,
-      ),
+      )
     );
   }
 
@@ -623,12 +626,12 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
     return ScaleTransition(
       scale: _buttonScaleAnimation,
       child: Container(
-        width: 200,
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 70),
         decoration: BoxDecoration(
           gradient: LinearGradient(
               colors: [Color.fromRGBO(78, 202, 241, 1), Color.fromRGBO(169, 219, 235, 1)],
           ),
-          borderRadius: BorderRadius.circular(25.0),
+          borderRadius: BorderRadius.circular(30.0),
         ),
         child: AnimatedButton(
           color: Colors.transparent,
@@ -673,16 +676,16 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
     final deviceSize = MediaQuery.of(context).size;
     final cardWidth = deviceSize.width;
     const cardPadding = 16.0;
-    final textFieldWidth = cardWidth - cardPadding * 2;
+    final textFieldWidth = cardWidth;
     final authForm = Form(
       key: _formKey,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             padding: EdgeInsets.only(
               left: cardPadding,
-              right: cardPadding,
-              top: cardPadding + 10,
+              right: cardPadding
             ),
             width: cardWidth,
             child: Column(
@@ -691,7 +694,7 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
                 _buildNameField(textFieldWidth, messages, auth),
                 SizedBox(height: 20),
                 _buildPasswordField(textFieldWidth, messages, auth),
-                SizedBox(height: 10),
+                //SizedBox(height: 20),
               ],
             ),
           ),
@@ -706,13 +709,13 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
             width: cardWidth,
             padding: EdgeInsets.symmetric(
               horizontal: cardPadding,
-              vertical: 10,
+              vertical: 0,
             ),
             onExpandCompleted: () => _postSwitchAuthController.forward(),
             child: _buildConfirmPasswordField(textFieldWidth, messages, auth),
           ),
           Container(
-            padding: Paddings.fromRBL(cardPadding),
+            //padding: EdgeInsets.symmetric(horizontal: cardPadding),
             width: cardWidth,
             child: Column(
               children: <Widget>[
@@ -730,13 +733,14 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
-        SizedBox(
-          height: deviceSize.height / 2,
+        Container(
+          //height: deviceSize.height / 2,
           child: Container(
             constraints: BoxConstraints(
                 minWidth: deviceSize.width
             ),
             child: Container(
+              padding: EdgeInsets.symmetric(vertical: 45, horizontal: 20),
               decoration: BoxDecoration(
                 color: theme.cardTheme.color,
                 borderRadius: const BorderRadius.only(topLeft: Radius.circular(25.0), topRight: Radius.circular(25.0))
@@ -880,24 +884,18 @@ class _RecoverCardState extends State<_RecoverCard>
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
         SizedBox(
-          height: deviceSize.height / 2,
+          // height: deviceSize.height / 2,
           child: Container(
             constraints: BoxConstraints(
                 minWidth: deviceSize.width
             ),
             child: Container(
+              padding: EdgeInsets.symmetric(vertical: 45, horizontal: 20),
               decoration: BoxDecoration(
                   color: theme.cardTheme.color,
                   borderRadius: const BorderRadius.only(topLeft: Radius.circular(25.0), topRight: Radius.circular(25.0))
               ),
               child: Container(
-                padding: const EdgeInsets.only(
-                  left: cardPadding,
-                  top: cardPadding + 10.0,
-                  right: cardPadding,
-                  bottom: cardPadding,
-                ),
-                width: cardWidth,
                 alignment: Alignment.center,
                 child: Form(
                   key: _formRecoverKey,
@@ -907,7 +905,7 @@ class _RecoverCardState extends State<_RecoverCard>
                         messages.recoverPasswordIntro,
                         key: kRecoverPasswordIntroKey,
                         textAlign: TextAlign.center,
-                        style: theme.textTheme.body1,
+                        style: TextStyle(color: Colors.white, fontSize: 18),
                       ),
                       SizedBox(height: 20),
                       _buildRecoverNameField(textFieldWidth, messages, auth),
@@ -918,8 +916,9 @@ class _RecoverCardState extends State<_RecoverCard>
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.white),
                       ),
-                      SizedBox(height: 26),
+                      SizedBox(height: 20),
                       _buildRecoverButton(theme, messages),
+                      SizedBox(height: 4),
                       _buildBackButton(theme, messages),
                     ],
                   ),
