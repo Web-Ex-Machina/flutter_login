@@ -1,5 +1,6 @@
 library flutter_login;
 
+import "dart:convert";
 import "dart:ui";
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
@@ -73,7 +74,7 @@ class _Header extends StatefulWidget {
     this.logoTag,
     this.title,
     this.titleTag,
-    this.height = 250.0,
+    this.height = 300.0,
     this.logoController,
     this.titleController,
     @required this.loginTheme,
@@ -142,16 +143,29 @@ class __HeaderState extends State<_Header> {
     final logoHeight = min(widget.height - _titleHeight - gap, kMaxLogoHeight);
     final displayLogo = widget.logoPath != null && logoHeight >= kMinLogoHeight;
 
-    Widget logo = displayLogo
-        ? Image.asset(
-            widget.logoPath,
-            filterQuality: FilterQuality.high,
-            height: logoHeight,
-            fit: BoxFit.contain,
-            alignment: Alignment.center,
-            width: (MediaQuery.of(context).size.width)*0.7,
-          )
-        : NullWidget();
+    Widget logo = NullWidget();
+
+    if(displayLogo) {
+      try {
+        logo = Image.memory(
+          base64.decode(widget.logoPath),
+          filterQuality: FilterQuality.high,
+          height: logoHeight,
+          fit: BoxFit.contain,
+          alignment: Alignment.center,
+          width: (MediaQuery.of(context).size.width)*0.7,
+        );
+      } catch(e) {
+        logo = Image.asset(
+          widget.logoPath,
+          filterQuality: FilterQuality.high,
+          height: logoHeight,
+          fit: BoxFit.contain,
+          alignment: Alignment.center,
+          width: (MediaQuery.of(context).size.width)*0.7,
+        );
+      }
+    }
 
     if (widget.logoTag != null) {
       logo = Hero(
