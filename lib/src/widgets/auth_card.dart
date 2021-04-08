@@ -622,23 +622,13 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
   Widget _buildSubmitButton(ThemeData theme, LoginMessages messages, Auth auth) {
     return ScaleTransition(
       scale: _buttonScaleAnimation,
-      child: Container(
-        width: 200,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-              colors: [Color.fromRGBO(78, 202, 241, 1), Color.fromRGBO(169, 219, 235, 1)],
-          ),
-          borderRadius: BorderRadius.circular(25.0),
-        ),
         child: AnimatedButton(
-          color: Colors.transparent,
-          loadingColor: Colors.transparent,
+          loadingColor: Colors.white,
           controller: _submitController,
           text: auth.isLogin ? messages.loginButton : messages.signupButton,
           onPressed: _submit,
-        ),
-      )
-    );
+        )
+      );
   }
 
   Widget _buildSwitchAuthButton(ThemeData theme, LoginMessages messages, Auth auth) {
